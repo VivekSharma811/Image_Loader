@@ -29,7 +29,14 @@ class PhotoRepositoryImpl(
         get() = _photos
 
     override suspend fun getPhotos(tag : String) {
+        emptyDb()
         initFetchFromApi(tag)
+    }
+
+    private fun emptyDb() {
+        GlobalScope.launch(Dispatchers.IO) {
+            photoDao.deleteAll()
+        }
     }
 
     private fun persistFetchedData(photoList : List<Photo>) {

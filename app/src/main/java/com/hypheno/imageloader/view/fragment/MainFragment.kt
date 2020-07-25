@@ -2,7 +2,11 @@ package com.hypheno.imageloader.view.fragment
 
 import android.os.Bundle
 import android.view.*
+import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuItemCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -23,6 +27,7 @@ class MainFragment : ScopedFragment(), KodeinAware {
     private val viewModelFactory by instance<MainViewModelFactory>()
     private lateinit var viewModel : MainViewModel
     private val imageAdapter = ImageAdapter(arrayListOf())
+    private lateinit var searchView : SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +41,81 @@ class MainFragment : ScopedFragment(), KodeinAware {
         return inflater.inflate(R.layout.fragment_main, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory)
+            .get(MainViewModel::class.java)
+
+        textview.visibility = View.VISIBLE
+        imageList.visibility = View.GONE
+        progressBar.visibility = View.GONE
+
+        imageList.apply {
+            layoutManager = GridLayoutManager(context, 2)
+            adapter = imageAdapter
+        }
+    }
+
+    fun bindUi(tag : String) = launch {
+        viewModel.getPhotos(tag)
+        viewModel.photosList.observe(viewLifecycleOwner, Observer {
+            if(it == null) {
+                return@Observer
+            }
+
+            if(it.size == 0) {
+                progressBar.visibility = View.GONE
+                imageList.visibility = View.GONE
+                textview.visibility = View.VISIBLE
+            } else {
+                imageAdapter.updateImages(it)
+                progressBar.visibility = View.GONE
+                textview.visibility = View.GONE
+                imageList.visibility = View.VISIBLE
+            }
+        })
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu, menu)
+
+        val searchItem: MenuItem = menu.findItem(R.id.search)
+        if(searchItem != null) {
+            searchView = MenuItemCompat.getActionView(searchItem) as SearchView
+            searchView.setOnCloseListener(object : SearchView.OnCloseListener {
+                override fun onClose(): Boolean {
+                    return true
+                }
+            })
+
+            val searchPlate = searchView.findViewById(androidx.appcompat.R.id.search_src_text) as EditText
+            searchPlate.hint = "Search"
+            val searchPlateView : View = searchView.findViewById(androidx.appcompat.R.id.search_plate)
+            context?.let {
+                searchPlateView.setBackgroundColor(
+                    ContextCompat.getColor(
+                        it,
+                        android.R.color.transparent
+                    )
+                )
+            }
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    query?.let {
+                        progressBar.visibility = View.VISIBLE
+                        imageList.visibility = View.GONE
+                        textview.visibility = View.GONE
+                        bindUi(it) }
+                    return false
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    return false
+                }
+            })
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -49,29 +126,5 @@ class MainFragment : ScopedFragment(), KodeinAware {
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(MainViewModel::class.java)
-
-        imageList.apply {
-            layoutManager = GridLayoutManager(context, 3)
-            adapter = imageAdapter
-        }
-
-        bindUi()
-    }
-
-    fun bindUi() = launch {
-        viewModel.getPhotos("dogs")
-        viewModel.photosList.observe(viewLifecycleOwner, Observer {
-            if(it == null) return@Observer
-
-            imageAdapter.updateImages(it)
-            imageList.visibility = View.VISIBLE
-        })
     }
 }
