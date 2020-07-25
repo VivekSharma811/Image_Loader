@@ -18,7 +18,7 @@ interface SearchApiService {
 
     companion object {
         operator fun invoke(
-            //connectivityInterceptor: ConnectivityInterceptor
+            connectivityInterceptor: ConnectivityInterceptor
         ) : SearchApiService {
             val requestInterceptor = Interceptor {chain ->
                 val url = chain.request()
@@ -37,7 +37,7 @@ interface SearchApiService {
 
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(requestInterceptor)
-                //.addInterceptor(connectivityInterceptor)
+                .addInterceptor(connectivityInterceptor)
                 .build()
 
             return Retrofit.Builder()

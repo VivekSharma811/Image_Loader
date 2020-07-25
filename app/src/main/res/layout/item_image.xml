@@ -7,7 +7,7 @@
             type="com.hypheno.imageloader.model.dataclass.Photo" />
     </data>
 <androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
+    android:layout_width="60dp"
     android:layout_height="60dp">
 
     <ImageView
