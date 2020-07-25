@@ -5,6 +5,6 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.hypheno.imageloader.MainFragment"
+        android:name="com.hypheno.imageloader.view.fragment.MainFragment"
         android:label="MainFragment" />
 </navigation>
