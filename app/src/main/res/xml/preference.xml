@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:title="Choose span count"
+        android:key="SPAN_COUNT"
+        android:defaultValue="2"
+        android:entries="@array/spanCount"
+        android:entryValues="@array/spanCount" />
+
+</PreferenceScreen>

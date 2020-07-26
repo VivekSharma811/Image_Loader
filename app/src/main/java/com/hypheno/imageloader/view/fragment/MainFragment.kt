@@ -1,5 +1,6 @@
 package com.hypheno.imageloader.view.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
@@ -9,8 +10,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.Navigation
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import com.hypheno.imageloader.R
+import com.hypheno.imageloader.model.provider.PreferenceProvider
 import com.hypheno.imageloader.view.adapter.ImageAdapter
 import com.hypheno.imageloader.viewmodel.MainViewModel
 import com.hypheno.imageloader.viewmodel.MainViewModelFactory
@@ -20,7 +24,7 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
 import org.kodein.di.generic.instance
 
-class MainFragment : ScopedFragment(), KodeinAware {
+class MainFragment() : ScopedFragment(), KodeinAware {
 
     override val kodein by closestKodein()
 
@@ -52,13 +56,13 @@ class MainFragment : ScopedFragment(), KodeinAware {
         progressBar.visibility = View.GONE
 
         imageList.apply {
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = getSpanCount()?.let { GridLayoutManager(context, it) }
             adapter = imageAdapter
         }
+        populateUi()
     }
 
-    fun bindUi(tag : String) = launch {
-        viewModel.getPhotos(tag)
+    fun populateUi() = launch {
         viewModel.photosList.observe(viewLifecycleOwner, Observer {
             if(it == null) {
                 return@Observer
@@ -75,6 +79,10 @@ class MainFragment : ScopedFragment(), KodeinAware {
                 imageList.visibility = View.VISIBLE
             }
         })
+    }
+
+    fun bindUi(tag : String) = launch {
+        viewModel.getPhotos(tag)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -121,10 +129,15 @@ class MainFragment : ScopedFragment(), KodeinAware {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.options -> {
-                Toast.makeText(context, "Working", Toast.LENGTH_LONG).show()
+                Navigation.findNavController(textview).navigate(MainFragmentDirections.actionSettings())
             }
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun getSpanCount() : Int? {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        return sharedPreferences.getString("SPAN_COUNT", "2")?.toInt()
     }
 }

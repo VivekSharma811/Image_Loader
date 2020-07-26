@@ -6,5 +6,13 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.hypheno.imageloader.view.fragment.MainFragment"
-        android:label="MainFragment" />
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/actionSettings"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.hypheno.imageloader.view.fragment.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>
