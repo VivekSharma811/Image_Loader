@@ -97,7 +97,6 @@ class MainFragment() : ScopedFragment(), KodeinAware {
         inflater.inflate(R.menu.menu, menu)
 
         val searchItem: MenuItem = menu.findItem(R.id.search)
-        if(searchItem != null) {
             searchView = MenuItemCompat.getActionView(searchItem) as SearchView
             searchView.setOnCloseListener(object : SearchView.OnCloseListener {
                 override fun onClose(): Boolean {
@@ -130,7 +129,6 @@ class MainFragment() : ScopedFragment(), KodeinAware {
                     return false
                 }
             })
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -144,9 +142,9 @@ class MainFragment() : ScopedFragment(), KodeinAware {
     }
 
     private fun setQuery(query : String) {
-        var editor = getSharedPreferences().edit()
+        val editor = getSharedPreferences().edit()
         editor.putString("QUERY", query)
-        editor.commit()
+        editor.apply()
     }
 
     private fun getQuery() : String? {
