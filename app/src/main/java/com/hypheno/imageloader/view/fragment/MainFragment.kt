@@ -14,7 +14,6 @@ import androidx.navigation.Navigation
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import com.hypheno.imageloader.R
-import com.hypheno.imageloader.model.provider.PreferenceProvider
 import com.hypheno.imageloader.view.adapter.ImageAdapter
 import com.hypheno.imageloader.viewmodel.MainViewModel
 import com.hypheno.imageloader.viewmodel.MainViewModelFactory
