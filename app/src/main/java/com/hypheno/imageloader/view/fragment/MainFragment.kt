@@ -1,10 +1,9 @@
 package com.hypheno.imageloader.view.fragment
 
-import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
@@ -58,7 +57,14 @@ class MainFragment() : ScopedFragment(), KodeinAware {
             layoutManager = getSpanCount()?.let { GridLayoutManager(context, it) }
             adapter = imageAdapter
         }
+        populateQuery()
         populateUi()
+    }
+
+    private fun populateQuery() {
+        getQuery()?.let {
+            query.text = it
+        }
     }
 
     fun populateUi() = launch {
@@ -81,6 +87,8 @@ class MainFragment() : ScopedFragment(), KodeinAware {
     }
 
     fun bindUi(tag : String) = launch {
+        setQuery(tag)
+        populateQuery()
         viewModel.getPhotos(tag)
     }
 
@@ -135,8 +143,21 @@ class MainFragment() : ScopedFragment(), KodeinAware {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun setQuery(query : String) {
+        var editor = getSharedPreferences().edit()
+        editor.putString("QUERY", query)
+        editor.commit()
+    }
+
+    private fun getQuery() : String? {
+        return getSharedPreferences().getString("QUERY", null)
+    }
+
     private fun getSpanCount() : Int? {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        return sharedPreferences.getString("SPAN_COUNT", "2")?.toInt()
+        return getSharedPreferences().getString("SPAN_COUNT", "2")?.toInt()
+    }
+
+    private fun getSharedPreferences() : SharedPreferences {
+        return PreferenceManager.getDefaultSharedPreferences(context)
     }
 }
